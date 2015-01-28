@@ -1,0 +1,5 @@
+[package]
+
+name = "shuffle"
+version = "0.0.1"
+authors = ["Linus Färnstrand <faern@faern.net>"]
