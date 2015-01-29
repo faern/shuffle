@@ -1,51 +1,53 @@
+extern crate core;
+extern crate argparse;
+
 use std::os;
+use argparse::{ArgumentParser, Collect, Store};
+use core::str::FromStr;
 use std::rand::{thread_rng, Rng};
 
 enum QuoteStyle {
   None,
   All,
-  WithSpace,
+  WithSpaces,
+}
+
+impl FromStr for QuoteStyle {
+  fn from_str(s: &str) -> Option<Self> {
+    match s {
+      "none" => Some(QuoteStyle::None),
+      "all" => Some(QuoteStyle::All),
+      "spaces" => Some(QuoteStyle::WithSpaces),
+      _ => None
+    }
+  }
 }
 
 fn main() {
-  let args = os::args();
-  if args.len() <= 1 {
-    return;
-  }
+  let mut quote_style: QuoteStyle = QuoteStyle::WithSpaces;
+  let mut values: Vec<String> = vec![];
+  {
+    let mut arg_parser = ArgumentParser::new();
+    arg_parser.set_description("Shuffle input arguments and print them out");
 
-  let mut arg_given = false;
-  let quote_style: QuoteStyle = match parse_quote_style(&args[]) {
-    Some(q) => {
-      arg_given = true;
-      q
-    },
-    None => QuoteStyle::WithSpace, //Default quote style
-  };
+    arg_parser.refer(&mut quote_style).add_option(&["-q", "--quote-style"],
+      Box::new(Store::<QuoteStyle>),
+      "Set what arguments to quote in the output. possible values: all, none, spaces");
 
-  let mut shuffle_list = args[if arg_given {2} else {1}..].to_vec();
-  let mut rng = thread_rng();
-  rng.shuffle(shuffle_list.as_mut_slice());
-
-  print_args(&shuffle_list[], quote_style);
-}
-
-fn parse_quote_style(args: &[String]) -> Option<QuoteStyle> {
-  if args.len() > 1 {
-    let arg0 = &args[1];
-    let mut arg0iter = arg0.chars();
-    if arg0iter.next() == Some('-') {
-      match arg0iter.next() {
-        Some('n') => Some(QuoteStyle::None),
-        Some('a') => Some(QuoteStyle::All),
-        Some('s') => Some(QuoteStyle::WithSpace),
-        _         => panic!("Invalid argument given"),
+    arg_parser.refer(&mut values).add_argument("values", Box::new(Collect::<String>), "List of values to shuffle");
+    match arg_parser.parse_args() {
+      Ok(()) => {},
+      Err(x) => {
+        os::set_exit_status(x);
+        return;
       }
-    } else {
-      None
     }
-  } else {
-    None
   }
+
+  let mut rng = thread_rng();
+  rng.shuffle(values.as_mut_slice());
+
+  print_args(&values[], quote_style);
 }
 
 fn print_args(args: &[String], quote_style: QuoteStyle) {
@@ -53,7 +55,7 @@ fn print_args(args: &[String], quote_style: QuoteStyle) {
     let quote = match quote_style {
       QuoteStyle::None => false,
       QuoteStyle::All => true,
-      QuoteStyle::WithSpace => item.find(|&: c: char| c.is_whitespace()).is_some(),
+      QuoteStyle::WithSpaces => item.find(|&: c: char| c.is_whitespace()).is_some(),
     };
     match quote {
       true => print!("\"{}\" ", item),

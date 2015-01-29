@@ -3,3 +3,6 @@
 name = "shuffle"
 version = "0.0.1"
 authors = ["Linus Färnstrand <faern@faern.net>"]
+
+[dependencies.argparse]
+git = "https://github.com/faern/rust-argparse"
