@@ -12,6 +12,11 @@ enum QuoteStyle {
   WithSpaces,
 }
 
+struct Args {
+  quote_style: QuoteStyle,
+  values: Vec<String>,
+}
+
 impl FromStr for QuoteStyle {
   fn from_str(s: &str) -> Option<Self> {
     match s {
@@ -24,8 +29,21 @@ impl FromStr for QuoteStyle {
 }
 
 fn main() {
+  let mut args = match parse_args() {
+    Some(a) => a,
+    None => return,
+  };
+
+  let mut rng = thread_rng();
+  rng.shuffle(args.values.as_mut_slice());
+
+  print_args(&args.values[], args.quote_style);
+}
+
+fn parse_args() -> Option<Args> {
   let mut quote_style: QuoteStyle = QuoteStyle::WithSpaces;
   let mut values: Vec<String> = vec![];
+
   {
     let mut arg_parser = ArgumentParser::new();
     arg_parser.set_description("Shuffle input arguments and print them out");
@@ -39,15 +57,12 @@ fn main() {
       Ok(()) => {},
       Err(x) => {
         os::set_exit_status(x);
-        return;
+        return None;
       }
     }
   }
 
-  let mut rng = thread_rng();
-  rng.shuffle(values.as_mut_slice());
-
-  print_args(&values[], quote_style);
+  Some(Args{ quote_style: quote_style, values: values })
 }
 
 fn print_args(args: &[String], quote_style: QuoteStyle) {
