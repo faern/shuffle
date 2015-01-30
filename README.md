@@ -15,12 +15,10 @@ Where options can be one of:
 
 ### Examples
 
-$ shuffle foo bar baz
-
+$ shuffle foo bar baz  
  baz foo bar
 
-$ shuffle foo bar "baz rust"
-
+$ shuffle foo bar "baz rust"  
  bar "baz rust" foo
 
 $ shuffle -q all foo bar "baz rust"
