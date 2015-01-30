@@ -34,8 +34,7 @@ fn main() {
     None => return,
   };
 
-  let mut rng = thread_rng();
-  rng.shuffle(args.values.as_mut_slice());
+  shuffle(args.values.as_mut_slice());
 
   print_args(&args.values[], args.quote_style);
 }
@@ -78,4 +77,19 @@ fn print_args(args: &[String], quote_style: QuoteStyle) {
     };
   }
   println!("");
+}
+
+/// Shuffle a mutable slice.
+///
+/// This is an implementation of the Fisher-Yates algorithm.
+/// I know this exact same algorithm is implemented in std, but I created this
+/// project to practice Rust, so why not just write more code.
+fn shuffle<T>(v: &mut [T]) {
+  let mut rng = thread_rng();
+  let mut i: usize = v.len() - 1;
+  while i > 0 {
+    let j: usize = rng.gen_range(0, i+1);
+    v.swap(i, j);
+    i = i - 1;
+  }
 }
