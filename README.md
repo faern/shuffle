@@ -15,23 +15,22 @@ Where options can be one of:
 
 ### Examples
 
+```
 $ shuffle foo bar baz  
  baz foo bar
 
 $ shuffle foo bar "baz rust"  
  bar "baz rust" foo
 
-$ shuffle -q all foo bar "baz rust"
-
+$ shuffle -q all foo bar "baz rust"  
  "baz rust" "foo" "bar"
 
-$ shuffle -q none foo bar "baz rust"
-
+$ shuffle -q none foo bar "baz rust"  
  baz rust bar foo
 
-$ shuffle -q spaces foo bar "baz rust"
-
+$ shuffle -q spaces foo bar "baz rust"  
  "baz rust" bar foo
+```
 
 Everything after a -- will be interpreted as values, not options. In case you want to shuffle something starting with -.
 
